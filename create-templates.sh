@@ -18,7 +18,7 @@ function create_template() {
     qm set $1 --serial0 socket --vga serial0
     #Set memory, cpu, type defaults
     #If you are in a cluster, you might need to change cpu type
-    qm set $1 --memory 1024 --cores 4 --cpu host
+    qm set $1 --memory 2048 --cores 4 --cpu host
     #Set boot device to new file
     qm set $1 --scsi0 ${storage}:0,import-from="$(pwd)/$3",discard=on
     #Set scsi hardware as default boot disk using virtio scsi single
@@ -27,6 +27,8 @@ function create_template() {
     qm set $1 --agent enabled=1,fstrim_cloned_disks=1
     #Add cloud-init device
     qm set $1 --ide2 ${storage}:cloudinit
+    #Do an automatic package upgrade after the first boot.
+    qm set $1 --ciupgrade 1
     #Set CI ip config
     #IP6 = auto means SLAAC (a reliable default with no bad effects on non-IPv6 networks)
     #IP = DHCP means what it says, so leave that out entirely on non-IPv4 networks to avoid DHCP delays
@@ -43,18 +45,16 @@ function create_template() {
     qm disk resize $1 scsi0 8G
     #Make it a template
     qm template $1
-
     #Remove file when done
     rm $3
 }
-
 
 #Path to your ssh authorized_keys file
 #Alternatively, use /etc/pve/priv/authorized_keys if you are already authorized
 #on the Proxmox system
 export ssh_keyfile=/root/id_rsa.pub
 #Username to create on VM template
-export username=apalrd
+export username=admin
 
 #Name of your storage
 export storage=local-zfs
@@ -64,40 +64,40 @@ export storage=local-zfs
 
 ## Debian
 #Buster (10)
-wget "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2"
-create_template 900 "temp-debian-10" "debian-10-genericcloud-amd64.qcow2"
+#wget "https://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2"
+#create_template 900 "temp-debian-10" "debian-10-genericcloud-amd64.qcow2"
 #Bullseye (11)
-wget "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2"
-create_template 901 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
+#wget "https://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2"
+#create_template 901 "temp-debian-11" "debian-11-genericcloud-amd64.qcow2" 
 #Bookworm (12)
-wget "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
-create_template 902 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2" 
+#wget "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2"
+#create_template 902 "temp-debian-12" "debian-12-genericcloud-amd64.qcow2" 
 #Trixie hasn't started pushing dailies yet, but it will be template 903
 #Sid (Unstable)
-wget "https://cloud.debian.org/images/cloud/sid/daily/latest/debian-sid-genericcloud-amd64-daily.qcow2"
-create_template 909 "temp-debian-sid" "debian-sid-genericcloud-amd64-daily.qcow2" 
+#wget "https://cloud.debian.org/images/cloud/sid/daily/latest/debian-sid-genericcloud-amd64-daily.qcow2"
+#create_template 909 "temp-debian-sid" "debian-sid-genericcloud-amd64-daily.qcow2" 
 
 ## Ubuntu
 #20.04 (Focal Fossa)
-wget "https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img"
-create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
+#wget "https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img"
+#create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
 #22.04 (Jammy Jellyfish)
 wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
 create_template 911 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #23.04 (Lunar Lobster) - daily builds
-wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
-create_template 912 "temp-ubuntu-23-04-daily" "lunar-server-cloudimg-amd64.img"
+#wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
+#create_template 912 "temp-ubuntu-23-04-daily" "lunar-server-cloudimg-amd64.img"
 
 ## Fedora 37
 #Image is compressed, so need to uncompress first
-wget https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.raw.xz
-xz -d -v Fedora-Cloud-Base-37-1.7.x86_64.raw.xz
-create_template 920 "temp-fedora-37" "Fedora-Cloud-Base-37-1.7.x86_64.raw"
+#wget https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.raw.xz
+#xz -d -v Fedora-Cloud-Base-37-1.7.x86_64.raw.xz
+#create_template 920 "temp-fedora-37" "Fedora-Cloud-Base-37-1.7.x86_64.raw"
 
 ## CentOS Stream
 #Stream 8
-wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-20220913.0.x86_64.qcow2
-create_template 930 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-20220913.0.x86_64.qcow2"
+#wget https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-GenericCloud-8-20220913.0.x86_64.qcow2
+#create_template 930 "temp-centos-8-stream" "CentOS-Stream-GenericCloud-8-20220913.0.x86_64.qcow2"
 #Stream 9 (daily) - they don't have a 'latest' link?
-wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
-create_template 931 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2"
+#wget https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2
+#create_template 931 "temp-centos-9-stream-daily" "CentOS-Stream-GenericCloud-9-20230123.0.x86_64.qcow2"
