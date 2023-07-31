@@ -83,6 +83,7 @@ export storage=local-zfs
 #create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
 #22.04 (Jammy Jellyfish)
 wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+virt-customize -a ubuntu-22.04-server-cloudimg-amd64.img --install qemu-guest-agent
 create_template 911 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #23.04 (Lunar Lobster) - daily builds
 #wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
