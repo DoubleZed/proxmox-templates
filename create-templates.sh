@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#Create template
-#args:
-# vm_id
-# vm_name
-# file name in the current directory
 function create_template() {
     #Print all of the configuration
     echo "Creating template $2 ($1)"
@@ -52,15 +47,12 @@ function create_template() {
 #Path to your ssh authorized_keys file
 #Alternatively, use /etc/pve/priv/authorized_keys if you are already authorized
 #on the Proxmox system
-export ssh_keyfile=/root/id_rsa.pub
+export ssh_keyfile=/root/.ssh/id_rsa.pub
 #Username to create on VM template
-export username=admin
+export username=adminguy
 
-#Name of your storage
+#Storage location
 export storage=local-zfs
-
-#The images that I've found premade
-#Feel free to add your own
 
 ## Debian
 #Buster (10)
