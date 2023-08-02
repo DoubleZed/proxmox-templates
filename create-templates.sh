@@ -27,7 +27,7 @@ function create_template() {
     qm set $1 --agent enabled=1,fstrim_cloned_disks=1
     #Add cloud-init device
     qm set $1 --ide2 ${storage}:cloudinit
-    #Do an automatic package upgrade after the first boot.
+    #Do an automatic package upgrade after the first boot (reboots afterwards automatically if needed)
     qm set $1 --ciupgrade 1
     #Set CI ip config
     #IP6 = auto means SLAAC (a reliable default with no bad effects on non-IPv6 networks)
@@ -83,7 +83,8 @@ export storage=local-zfs
 #create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
 #22.04 (Jammy Jellyfish)
 wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
-virt-customize -a ubuntu-22.04-server-cloudimg-amd64.img --install qemu-guest-agent
+# Install qemu-guest-agent and truncate the machine-id to make sure the VM gets a unique ID.
+virt-customize --install qemu-guest-agent --truncate /etc/machine-id -a ubuntu-22.04-server-cloudimg-amd64.img
 create_template 911 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #23.04 (Lunar Lobster) - daily builds
 #wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
