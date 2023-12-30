@@ -55,6 +55,7 @@ export username=svc-adm
 #The following is a special usecase to my setup where storage is called VM-local-XX where XX is the ID of the node where the storage is hosted on.
 export hostname=$(hostname -s)
 export storage=VM-local-${hostname: -2}
+export tempid=90${hostname: -2}
 
 ## Ubuntu
 #20.04 (Focal Fossa)
@@ -64,7 +65,7 @@ export storage=VM-local-${hostname: -2}
 wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
 # Install qemu-guest-agent and truncate the machine-id to make sure the VM gets a unique ID.
 virt-customize --install qemu-guest-agent --truncate /etc/machine-id -a ubuntu-22.04-server-cloudimg-amd64.img
-create_template 9000 "temp-ubuntu-22-04-k3s" "ubuntu-22.04-server-cloudimg-amd64.img" 
+create_template $tempid "temp-ubuntu-22-04-k3s" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #23.04 (Lunar Lobster) - daily builds
 #wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
 #create_template 912 "temp-ubuntu-23-04-daily" "lunar-server-cloudimg-amd64.img"
