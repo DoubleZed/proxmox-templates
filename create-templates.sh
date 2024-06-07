@@ -74,9 +74,18 @@ export storage=local-zfs
 #wget "https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img"
 #create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
 #22.04 (Jammy Jellyfish)
-wget "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+export imagename=ubuntu-22.04-server-cloudimg-amd64.img
+wget "https://cloud-images.ubuntu.com/releases/22.04/release/${imagename}"
 # Install qemu-guest-agent and truncate the machine-id to make sure the VM gets a unique ID.
-virt-customize --install qemu-guest-agent --truncate /etc/machine-id -a ubuntu-22.04-server-cloudimg-amd64.img
+virt-customize -a ${imagename} --update
+virt-customize --install qemu-guest-agent --truncate /etc/machine-id -a ${imagename}
+virt-customize -a ${imagename} --run-command 'useradd --shell /bin/bash ansible'
+virt-customize -a ${imagename} --run-command 'mkdir -p /home/ansible/.ssh'
+virt-customize -a ${imagename} --ssh-inject ansible:file:/root/keys/id_mykeys.pub
+virt-customize -a ${imagename} --run-command 'chown -R ansible:ansible /home/ansible'
+virt-customize -a ${imagename} --upload /root/ansible:/etc/sudoers.d/ansible
+virt-customize -a ${imagename} --run-command 'chmod 0440 /etc/sudoers.d/ansible'
+virt-customize -a ${imagename} --run-command 'chown root:root /etc/sudoers.d/ansible'
 create_template 911 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
 #23.04 (Lunar Lobster) - daily builds
 #wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
