@@ -85,7 +85,7 @@ virt-customize -a ${imagename} --run-command 'useradd --shell /bin/bash ${ansibl
 virt-customize -a ${imagename} --run-command 'mkdir -p /home/${ansible-username}/.ssh'
 virt-customize -a ${imagename} --ssh-inject ${ansible-username}:file:${ansible_ssh_keyfile}
 virt-customize -a ${imagename} --run-command 'chown -R ${ansible-username}:${ansible-username} /home/${ansible-username}'
-virt-customize -a ${imagename} --upload /root/ansible:/etc/sudoers.d/${ansible-username}
+virt-customize -a ${imagename} --upload /root/${ansible-username}:/etc/sudoers.d/${ansible-username}
 virt-customize -a ${imagename} --run-command 'chmod 0440 /etc/sudoers.d/${ansible-username}'
 virt-customize -a ${imagename} --run-command 'chown root:root /etc/sudoers.d/${ansible-username}'
 create_template 911 "temp-ubuntu-24-04" ${imagename}
