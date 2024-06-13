@@ -41,15 +41,17 @@ function create_template() {
     #Make it a template
     qm template $1
     #Remove file when done
-    rm $3
+    #rm $3
 }
 
 #Path to your ssh authorized_keys file
 #Alternatively, use /etc/pve/priv/authorized_keys if you are already authorized
 #on the Proxmox system
-export ssh_keyfile=/root/.ssh/id_rsa.pub
+export admin_ssh_keyfile=/root/.ssh/id_rsa.pub
+export ansible_ssh_keyfile=/root/.ssh/id_rsa.pub
 #Username to create on VM template
-export username=adminguy
+export admin-username=adminguy
+export ansible-username=ansible
 
 #Storage location
 export storage=local-zfs
@@ -73,20 +75,20 @@ export storage=local-zfs
 #20.04 (Focal Fossa)
 #wget "https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img"
 #create_template 910 "temp-ubuntu-20-04" "ubuntu-20.04-server-cloudimg-amd64.img" 
-#22.04 (Jammy Jellyfish)
-export imagename=ubuntu-22.04-server-cloudimg-amd64.img
-wget "https://cloud-images.ubuntu.com/releases/22.04/release/${imagename}"
+#24.04 (Jammy Jellyfish)
+export imagename=ubuntu-24.04-server-cloudimg-amd64.img
+wget "https://cloud-images.ubuntu.com/releases/24.04/release/${imagename}"
 # Install qemu-guest-agent and truncate the machine-id to make sure the VM gets a unique ID.
 virt-customize -a ${imagename} --update
 virt-customize --install qemu-guest-agent --truncate /etc/machine-id -a ${imagename}
-virt-customize -a ${imagename} --run-command 'useradd --shell /bin/bash ansible'
-virt-customize -a ${imagename} --run-command 'mkdir -p /home/ansible/.ssh'
-virt-customize -a ${imagename} --ssh-inject ansible:file:/root/keys/id_mykeys.pub
-virt-customize -a ${imagename} --run-command 'chown -R ansible:ansible /home/ansible'
-virt-customize -a ${imagename} --upload /root/ansible:/etc/sudoers.d/ansible
-virt-customize -a ${imagename} --run-command 'chmod 0440 /etc/sudoers.d/ansible'
-virt-customize -a ${imagename} --run-command 'chown root:root /etc/sudoers.d/ansible'
-create_template 911 "temp-ubuntu-22-04" "ubuntu-22.04-server-cloudimg-amd64.img" 
+virt-customize -a ${imagename} --run-command 'useradd --shell /bin/bash ${ansible-username}'
+virt-customize -a ${imagename} --run-command 'mkdir -p /home/${ansible-username}/.ssh'
+virt-customize -a ${imagename} --ssh-inject ${ansible-username}:file:${ansible_ssh_keyfile}
+virt-customize -a ${imagename} --run-command 'chown -R ${ansible-username}:${ansible-username} /home/${ansible-username}'
+virt-customize -a ${imagename} --upload /root/ansible:/etc/sudoers.d/${ansible-username}
+virt-customize -a ${imagename} --run-command 'chmod 0440 /etc/sudoers.d/${ansible-username}'
+virt-customize -a ${imagename} --run-command 'chown root:root /etc/sudoers.d/${ansible-username}'
+create_template 911 "temp-ubuntu-24-04" ${imagename}
 #23.04 (Lunar Lobster) - daily builds
 #wget "https://cloud-images.ubuntu.com/lunar/current/lunar-server-cloudimg-amd64.img"
 #create_template 912 "temp-ubuntu-23-04-daily" "lunar-server-cloudimg-amd64.img"
